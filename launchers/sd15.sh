@@ -10,10 +10,10 @@ accelerate launch train.py \
   --train_batch_size=1 \
   --dataloader_num_workers=16 \
   --gradient_accumulation_steps=128 \
-  --max_train_steps=2000 \
+  --max_train_steps=10 \
   --lr_scheduler="constant_with_warmup" --lr_warmup_steps=500 \
   --learning_rate=1e-8 --scale_lr \
-  --cache_dir="/export/share/datasets/vision_language/pick_a_pic_v2/" \
+  --cache_dir="/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/DiffusionDPO/temp_cache/" \
   --checkpointing_steps 500 \
   --beta_dpo 5000 \
    --output_dir="tmp-sd15"
