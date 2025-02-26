@@ -712,7 +712,7 @@ def main():
 
     # 6. Get the column names for input/target.
     dataset_columns = DATASET_NAME_MAPPING.get(args.dataset_name, None)
-    if 'pickapic' in args.dataset_name or (args.train_method == 'dpo'):
+    if args.train_method == 'dpo':
         pass
     elif args.image_column is None:
         image_column = dataset_columns[0] if dataset_columns is not None else column_names[0]
@@ -772,8 +772,7 @@ def main():
         def preprocess_train(examples):
             all_pixel_values = []
             for col_name in ['jpg_0', 'jpg_1']:
-                images = [Image.open(io.BytesIO(im_bytes)).convert("RGB")
-                            for im_bytes in examples[col_name]]
+                images = [Image.open(os.path.join(args.train_data_dir, "train", im_bytes)).convert("RGB") for im_bytes in examples[col_name]]
                 pixel_values = [train_transforms(image) for image in images]
                 all_pixel_values.append(pixel_values)
             # Double on channel dim, jpg_y then jpg_w
@@ -827,7 +826,7 @@ def main():
                 return do_flip(batch['jpg_0'][0], batch['jpg_1'][0], batch['caption'][0])
     elif args.train_method == 'sft':
         def preprocess_train(examples):
-            if 'pickapic' in args.dataset_name:
+            if args.dataset_name is not None and 'pickapic' in args.dataset_name:
                 images = []
                 # Probably cleaner way to do this iteration
                 for im_0_bytes, im_1_bytes, label_0 in zip(examples['jpg_0'], examples['jpg_1'], examples['label_0']):
@@ -853,7 +852,7 @@ def main():
     
     ### DATASET #####
     with accelerator.main_process_first():
-        if 'pickapic' in args.dataset_name:
+        if args.dataset_name is not None and 'pickapic' in args.dataset_name:
             # eliminate no-decisions (0.5-0.5 labels)
             orig_len = dataset[args.split].num_rows
             not_split_idx = [i for i,label_0 in enumerate(dataset[args.split]['label_0'])
