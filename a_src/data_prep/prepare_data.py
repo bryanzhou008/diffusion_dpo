@@ -87,7 +87,7 @@ accelerate launch train.py \\
   --lr_scheduler="constant_with_warmup" --lr_warmup_steps=500 \\
   --learning_rate=1e-8 --scale_lr \\
   --cache_dir="/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/temp_cache/" \\
-  --checkpointing_steps 500 \\
+  --checkpointing_steps 100 \\
   --beta_dpo 5000 \\
   --output_dir="tmp-sd15-dialect"
 """
