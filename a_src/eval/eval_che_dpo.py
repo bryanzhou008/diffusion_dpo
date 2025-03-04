@@ -22,13 +22,10 @@ DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/tra
 # General quality evaluation prompts
 general_prompts = [
     "A giant dinosaur frozen into a glacier and recently discovered by scientists, cinematic still",
-    "A purple raven flying over big sur, light fog, deep focus+closeup, hyper-realistic, volumetric lighting, dramatic lighting, beautiful composition, intricate details, instagram, trending, photograph, film grain and noise, 8K, cinematic, post-production",
     "A cute puppy leading a session of the United Nations, newspaper photography",
-    "Worm eye view of rocketship",
     "A towering hurricane of rainbow colors towering over a city, cinematic digital art",
     "A redwood tree rising up out of the ocean"
 ]
-
 # Generate model dictionary using checkpoints from 100 to 2000 (step 100)
 checkpoint_nums = list(range(200, 2401, 400))
 model_dict = {}
