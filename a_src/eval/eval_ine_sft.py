@@ -111,7 +111,7 @@ summary_results = []
 # Open the detailed results file for writing.
 with open(eval_results_file, "w") as f_eval:
     # Write header for detailed results.
-    f_eval.write("Model,Evaluation_Type,Prompt,Reference_Prompt,Avg_Score,Individual_Scores\n")
+    f_eval.write("Model,Evaluation_Type,Prompt,Reference_Prompt,Avg_Score\n")
     
     # Process each model one by one.
     model_keys = list(model_dict.keys())
@@ -137,7 +137,7 @@ with open(eval_results_file, "w") as f_eval:
             dialect_scores_all.append(avg_score)
             # Write the detailed result for this row.
             ind_scores_str = ";".join(map(str, ind_scores))
-            line = f"{model_name},dialect_understanding,\"{dialect_prompt}\",\"{sae_prompt}\",{avg_score},{ind_scores_str}\n"
+            line = f"{model_name},dialect_understanding,\"{dialect_prompt}\",\"{sae_prompt}\",{avg_score}\n"
             f_eval.write(line)
         
         # Write an empty line after finishing dialect evaluations for this model.
@@ -153,7 +153,7 @@ with open(eval_results_file, "w") as f_eval:
             avg_score, ind_scores = evaluate_images(img_paths, prompt)
             general_scores_all.append(avg_score)
             ind_scores_str = ";".join(map(str, ind_scores))
-            line = f"{model_name},general_quality,\"{prompt}\",\"{prompt}\",{avg_score},{ind_scores_str}\n"
+            line = f"{model_name},general_quality,\"{prompt}\",\"{prompt}\",{avg_score}\n"
             f_eval.write(line)
         
         # Write an empty line after finishing general quality evaluations for this model.

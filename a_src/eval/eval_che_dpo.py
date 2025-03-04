@@ -13,7 +13,7 @@ guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 
 # Folder for output
-OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-dpo-4-1-1"
+OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/che-dpo-basic-4-1-1-9"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # CSV file with test prompts
@@ -34,7 +34,7 @@ checkpoint_nums = list(range(200, 2401, 400))
 model_dict = {}
 for num in checkpoint_nums:
     model_key = f"checkpoint_{num}"
-    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/ine-dpo-2-2-2/checkpoint-{num}"
+    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/che-dpo-basic-4-1-1-9/checkpoint-{num}"
     model_dict[model_key] = model_path
 
 # Read the CSV file (it has a header with at least: Dialect_Word, SAE_Word, Dialect_Prompt, SAE_Prompt)
