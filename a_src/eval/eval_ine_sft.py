@@ -8,7 +8,7 @@ import t2v_metrics
 
 # -------------------- Configuration --------------------
 # Generation settings
-num_images = 9
+num_images = 4
 guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 

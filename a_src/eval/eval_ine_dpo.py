@@ -8,16 +8,16 @@ import t2v_metrics
 
 # -------------------- Configuration --------------------
 # Generation settings
-num_images = 9
+num_images = 4
 guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 
 # Folder for output
-OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-dpo-2-2-2"
+OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-dpo-4-1-1"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # CSV file with test prompts
-DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/2-2-2/basic/ine/test.csv"
+DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/4-1-1/basic/ine/test.csv"
 
 # General quality evaluation prompts
 general_prompts = [
@@ -30,7 +30,7 @@ general_prompts = [
 ]
 
 # Generate model dictionary using checkpoints from 100 to 2000 (step 100)
-checkpoint_nums = list(range(100, 2001, 100))
+checkpoint_nums = list(range(200, 2401, 400))
 model_dict = {}
 for num in checkpoint_nums:
     model_key = f"checkpoint_{num}"
