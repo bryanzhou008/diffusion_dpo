@@ -13,7 +13,11 @@ guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 
 # Folder for output
+<<<<<<< HEAD
 OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-dpo-basic-4-1-1-9-SAE"
+=======
+OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-dpo-basic-4-1-1-9-base"
+>>>>>>> 71cb57cadfb6114df188dd8dd5e2dcd36cc0d517
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # CSV file with test prompts
@@ -109,7 +113,11 @@ with open(eval_results_file, "w") as f_eval:
         sae_prompt = row["SAE_Prompt"]
         # Create a folder for this row's output
         row_folder = os.path.join(OUTPUT_DIR, "checkpoint_000", "dialect", dialect_prompt)
+<<<<<<< HEAD
         img_paths = generate_and_save_images(pipe, sae_prompt, row_folder, base_seed=100)
+=======
+        img_paths = generate_and_save_images(pipe, dialect_prompt, row_folder, base_seed=100)
+>>>>>>> 71cb57cadfb6114df188dd8dd5e2dcd36cc0d517
         avg_score, _ = evaluate_images(img_paths, sae_prompt)
         dialect_scores_all.append(avg_score)
         line = f"checkpoint_000,dialect_understanding,\"{dialect_prompt}\",\"{sae_prompt}\",{avg_score}\n"

@@ -883,7 +883,7 @@ def main():
         collate_fn=collate_fn,
         batch_size=args.train_batch_size,
         num_workers=args.dataloader_num_workers,
-        drop_last=True
+        drop_last=False
     )
     ##### END BIG OLD DATASET BLOCK #####
     
