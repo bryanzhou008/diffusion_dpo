@@ -13,11 +13,11 @@ guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 
 # Folder for output
-OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-sft-2-2-2"
+OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/ine-sft-basic-4-1-1-9"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # CSV file with test prompts
-DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/2-2-2/basic/ine/test.csv"
+DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/4-1-1/basic/ine/test.csv"
 
 # General quality evaluation prompts
 general_prompts = [
@@ -28,13 +28,12 @@ general_prompts = [
 ]
 
 # Generate model dictionary using checkpoints from 100 to 2000 (step 100)
-checkpoint_nums = list(range(100, 3001, 100))
+checkpoint_nums = list(range(6000, 10401, 400))
 model_dict = {}
 for num in checkpoint_nums:
     model_key = f"checkpoint_{num}"
-    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/ine-sft-2-2-2/checkpoint-{num}"
+    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/ine-sft-basic-4-1-1-9/checkpoint-{num}"
     model_dict[model_key] = model_path
-
 # Read the CSV file (it has a header with at least: Dialect_Word, SAE_Word, Dialect_Prompt, SAE_Prompt)
 df = pd.read_csv(DATA_CSV, encoding="utf-8")
 
@@ -58,16 +57,21 @@ def load_pipeline(ckpt, device):
 def generate_and_save_images(pipe, prompt, output_folder, base_seed=42):
     """
     Generate num_images images using the provided prompt and save them in output_folder.
+    Skips generation if the image already exists.
     Returns a list of file paths for the saved images.
     """
     os.makedirs(output_folder, exist_ok=True)
     image_paths = []
     for i in range(num_images):
+        img_path = os.path.join(output_folder, f"{i}.jpg")
+        if os.path.exists(img_path):
+            print(f"Image {img_path} already exists, skipping generation.")
+            image_paths.append(img_path)
+            continue
         seed = base_seed + i
         generator = torch.Generator(device=pipe.device).manual_seed(seed)
         result = pipe(prompt=prompt, guidance_scale=guidance_scale, generator=generator)
         image = result.images[0]
-        img_path = os.path.join(output_folder, f"{i}.jpg")
         image.save(img_path)
         image_paths.append(img_path)
     return image_paths

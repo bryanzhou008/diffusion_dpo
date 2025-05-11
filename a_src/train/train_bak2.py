@@ -45,19 +45,24 @@ from transformers import CLIPTextModel, CLIPTokenizer
 from transformers.utils import ContextManagers
 
 import diffusers
-from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel, StableDiffusionXLPipeline
+from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel,     StableDiffusionXLPipeline
 from diffusers.optimization import get_scheduler
 from diffusers.utils import check_min_version, deprecate, is_wandb_available, make_image_grid
 from diffusers.utils.import_utils import is_xformers_available
 
+
 if is_wandb_available():
     import wandb
 
+    
+    
 ## SDXL
 import functools
 import gc
 from torchvision.transforms.functional import crop
 from transformers import AutoTokenizer, PretrainedConfig
+
+
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.20.0")
@@ -69,6 +74,7 @@ DATASET_NAME_MAPPING = {
     "yuvalkirstain/pickapic_v2": ("jpg_0", "jpg_1", "label_0", "caption"),
 }
 
+        
 def import_model_class_from_model_name_or_path(
     pretrained_model_name_or_path: str, revision: str, subfolder: str = "text_encoder"
 ):
@@ -79,12 +85,15 @@ def import_model_class_from_model_name_or_path(
 
     if model_class == "CLIPTextModel":
         from transformers import CLIPTextModel
+
         return CLIPTextModel
     elif model_class == "CLIPTextModelWithProjection":
         from transformers import CLIPTextModelWithProjection
+
         return CLIPTextModelWithProjection
     else:
         raise ValueError(f"{model_class} is not supported.")
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
@@ -379,6 +388,7 @@ def parse_args():
     args.train_method = 'sft' if args.sft else 'dpo'
     return args
 
+
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
 def encode_prompt_sdxl(batch, text_encoders, tokenizers, proportion_empty_prompts, caption_column, is_train=True):
     prompt_embeds_list = []
@@ -419,6 +429,9 @@ def encode_prompt_sdxl(batch, text_encoders, tokenizers, proportion_empty_prompt
     prompt_embeds = torch.concat(prompt_embeds_list, dim=-1)
     pooled_prompt_embeds = pooled_prompt_embeds.view(bs_embed, -1)
     return {"prompt_embeds": prompt_embeds, "pooled_prompt_embeds": pooled_prompt_embeds}
+
+
+
 
 def main():
     
@@ -523,6 +536,7 @@ def main():
 
         return [deepspeed_plugin.zero3_init_context_manager(enable=False)]
 
+    
     # BRAM NOTE: We're not using deepspeed currently so not sure it'll work. Could be good to add though!
     # 
     # Currently Accelerate doesn't know how to handle multiple models under Deepspeed ZeRO stage 3.
@@ -596,6 +610,8 @@ def main():
             text_encoder.requires_grad_(False)
     if args.train_method == 'dpo': ref_unet.requires_grad_(False)
     
+
+
     # xformers efficient attention
     if is_xformers_available():
         import xformers
@@ -675,7 +691,7 @@ def main():
                                            weight_decay=args.adam_weight_decay,
                                            clip_threshold=1.0,
                                            scale_parameter=False,
-                                           relative_step=False)
+                                          relative_step=False)
     else:
         optimizer = torch.optim.AdamW(
             params_to_optimize,
@@ -685,6 +701,9 @@ def main():
             eps=args.adam_epsilon,
         )
 
+        
+        
+        
     # In distributed training, the load_dataset function guarantees that only one local process can concurrently
     # download the dataset.
     if args.dataset_name is not None:
@@ -764,6 +783,7 @@ def main():
         ]
     )
 
+    
     ##### START BIG OLD DATASET BLOCK #####
     
     #### START PREPROCESSING/COLLATION ####
@@ -901,6 +921,7 @@ def main():
         num_training_steps=args.max_train_steps * accelerator.num_processes,
     )
 
+    
     #### START ACCELERATOR PREP ####
     unet, optimizer, train_dataloader, lr_scheduler = accelerator.prepare(
         unet, optimizer, train_dataloader, lr_scheduler
@@ -916,6 +937,7 @@ def main():
         weight_dtype = torch.bfloat16
         args.mixed_precision = accelerator.mixed_precision
 
+        
     # Move text_encode and vae to gpu and cast to weight_dtype
     vae.to(accelerator.device, dtype=weight_dtype)
     if args.sdxl:
@@ -936,6 +958,7 @@ def main():
             ref_unet.to(accelerator.device, dtype=weight_dtype)
     ### END ACCELERATOR PREP ###
     
+    
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
     if overrode_max_train_steps:
@@ -948,9 +971,6 @@ def main():
     if accelerator.is_main_process:
         tracker_config = dict(vars(args))
         accelerator.init_trackers(args.tracker_project_name, tracker_config)
-        # Explicitly initialize wandb if reporting to wandb and not already initialized.
-        if args.report_to == "wandb" and (not wandb.run):
-            wandb.init(project=args.tracker_project_name, config=vars(args))
 
     # Training initialization
     total_batch_size = args.train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
@@ -964,6 +984,7 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
+
 
     # Potentially load in the weights and states from a previous save
     if args.resume_from_checkpoint:
@@ -990,10 +1011,12 @@ def main():
             first_epoch = global_step // num_update_steps_per_epoch
             resume_step = resume_global_step % (num_update_steps_per_epoch * args.gradient_accumulation_steps)
         
+
     # Bram Note: This was pretty janky to wrangle to look proper but works to my liking now
     progress_bar = tqdm(range(global_step, args.max_train_steps), disable=not accelerator.is_local_main_process)
     progress_bar.set_description("Steps")
 
+        
     #### START MAIN TRAINING LOOP #####
     for epoch in range(first_epoch, args.num_train_epochs):
         unet.train()
@@ -1052,6 +1075,7 @@ def main():
 
                 # Add noise to the latents according to the noise magnitude at each timestep
                 # (this is the forward diffusion process)
+                
                 noisy_latents = noise_scheduler.add_noise(latents,
                                                           new_noise if args.input_perturbation else noise,
                                                           timesteps)
@@ -1080,10 +1104,10 @@ def main():
                                                          device=accelerator.device)[None, :].repeat(timesteps.size(0), 1)
                         prompt_batch = encode_prompt_sdxl(batch, 
                                                           text_encoders,
-                                                          tokenizers,
-                                                          args.proportion_empty_prompts, 
+                                                           tokenizers,
+                                                           args.proportion_empty_prompts, 
                                                           caption_column='caption',
-                                                          is_train=True,
+                                                           is_train=True,
                                                           )
                     if args.train_method == 'dpo':
                         prompt_batch["prompt_embeds"] = prompt_batch["prompt_embeds"].repeat(2, 1, 1)
@@ -1188,6 +1212,7 @@ def main():
             if global_step >= args.max_train_steps:
                 break
 
+
     # Create the pipeline using the trained modules and save it.
     # This will save to top level of output_dir instead of a checkpoint directory
     accelerator.wait_for_everyone()
@@ -1215,11 +1240,9 @@ def main():
             )
         pipeline.save_pretrained(args.output_dir)
 
+
     accelerator.end_training()
 
-    # Finalize wandb run if reporting to wandb
-    if accelerator.is_main_process and args.report_to == "wandb" and wandb.run is not None:
-        wandb.finish()
 
 if __name__ == "__main__":
     main()

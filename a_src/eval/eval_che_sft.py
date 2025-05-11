@@ -13,11 +13,11 @@ guidance_scale = 7.5
 base_model_name = "runwayml/stable-diffusion-v1-5"
 
 # Folder for output
-OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/che-dpo-basic-4-1-1-9-v1"
+OUTPUT_DIR = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_outputs/che-sft-basic-4-1-1-9"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # CSV file with test prompts
-DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/4-1-1/basic/che/test.csv"
+DATA_CSV = "/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/data/text/train_val_test/4-1-1/basic/ine/test.csv"
 
 # General quality evaluation prompts
 general_prompts = [
@@ -27,11 +27,11 @@ general_prompts = [
     "A redwood tree rising up out of the ocean"
 ]
 # Generate model dictionary using checkpoints from 100 to 2000 (step 100)
-checkpoint_nums = list(range(500, 4501, 500))
+checkpoint_nums = list(range(200, 2401, 400))
 model_dict = {}
 for num in checkpoint_nums:
     model_key = f"checkpoint_{num}"
-    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/che-dpo-basic-4-1-1-9-v1/checkpoint-{num}"
+    model_path = f"/local1/bryanzhou008/Dialect/multimodal-dialectal-bias/mitigation/baselines/diffusion_dpo/a_checkpoints/che-sft-basic-4-1-1-9/checkpoint-{num}"
     model_dict[model_key] = model_path
 
 # Read the CSV file (it has a header with at least: Dialect_Word, SAE_Word, Dialect_Prompt, SAE_Prompt)

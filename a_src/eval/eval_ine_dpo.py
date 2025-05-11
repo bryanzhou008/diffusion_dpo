@@ -28,7 +28,7 @@ general_prompts = [
 ]
 
 # Generate model dictionary using checkpoints from 100 to 2000 (step 100)
-checkpoint_nums = list(range(200, 2401, 400))
+checkpoint_nums = list(range(5400, 11001, 400))
 model_dict = {}
 for num in checkpoint_nums:
     model_key = f"checkpoint_{num}"
@@ -58,16 +58,21 @@ def load_pipeline(ckpt, device):
 def generate_and_save_images(pipe, prompt, output_folder, base_seed=42):
     """
     Generate num_images images using the provided prompt and save them in output_folder.
+    Skips generation if the image already exists.
     Returns a list of file paths for the saved images.
     """
     os.makedirs(output_folder, exist_ok=True)
     image_paths = []
     for i in range(num_images):
+        img_path = os.path.join(output_folder, f"{i}.jpg")
+        if os.path.exists(img_path):
+            print(f"Image {img_path} already exists, skipping generation.")
+            image_paths.append(img_path)
+            continue
         seed = base_seed + i
         generator = torch.Generator(device=pipe.device).manual_seed(seed)
         result = pipe(prompt=prompt, guidance_scale=guidance_scale, generator=generator)
         image = result.images[0]
-        img_path = os.path.join(output_folder, f"{i}.jpg")
         image.save(img_path)
         image_paths.append(img_path)
     return image_paths
